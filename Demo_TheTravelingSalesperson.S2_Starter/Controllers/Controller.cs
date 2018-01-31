@@ -99,10 +99,19 @@ namespace Demo_TheTravelingSalesperson
                     case MenuOption.Travel:
                         Travel();
                         break;
-                    case MenuOption.DisplayCities:
+                    case MenuOption.Buy:
+                        Buy();
+                        break;
+                    case MenuOption.Sell:
+                        Sell();
+                        break;
+                    case MenuOption.Display_Inventory:
+                        DisplayInventory();
+                        break;
+                    case MenuOption.Display_Cities:
                         DisplayCities();
                         break;
-                    case MenuOption.DisplayAccountInfo:
+                    case MenuOption.Display_Account_Info:
                         DisplayAccountInfo();
                         break;
                     case MenuOption.Exit:
@@ -135,6 +144,26 @@ namespace Demo_TheTravelingSalesperson
             {
                 _salesperson.CitiesVisited.Add(nextCity);
             }
+        }
+
+        private void Buy()
+        {
+            int numberOfUnits = _consoleView.DisplayGetNumberOfUnitsToBuy( _salesperson.CurrentStock );
+            _salesperson.CurrentStock.AddProducts(numberOfUnits);
+        }
+
+        private void Sell()
+        {
+            int numberOfUnits = _consoleView.DisplayGetNumberOfUnitsToSell(_salesperson.CurrentStock);
+            _salesperson.CurrentStock.SubtractProducts(numberOfUnits);
+
+            if (_salesperson.CurrentStock.OnBackorder)
+                _consoleView.DisplayBackorderNotification(_salesperson.CurrentStock, numberOfUnits);
+        }
+
+        private void DisplayInventory()
+        {
+            _consoleView.DisplayInventory(_salesperson.CurrentStock);
         }
 
         /// <summary>

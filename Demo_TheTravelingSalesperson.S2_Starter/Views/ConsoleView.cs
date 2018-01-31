@@ -11,13 +11,9 @@ namespace Demo_TheTravelingSalesperson
     /// </summary>
     public class ConsoleView
     {
-        #region FIELDS
-
-        int MAXIMUM_ATTEMPTS;
-        int MAXIMUM_BUYSELL_AMOUNT;
-        int MINIMUM_BUYSELL_AMOUNT;
-
-        #endregion
+        int MAXIMUM_ATTEMPTS = 10;
+        int MINIMUM_BUYSELL_AMOUNT = 1;
+        int MAXIMUM_BUYSELL_AMOUNT = 100;
 
         #region PROPERTIES
 
@@ -42,7 +38,7 @@ namespace Demo_TheTravelingSalesperson
         /// </summary>
         private void InitializeConsole()
         {
-            ConsoleUtil.WindowTitle = "Laughing Leaf Productions";
+            ConsoleUtil.WindowTitle = "Window Title Here.";
             ConsoleUtil.HeaderText = "The Traveling Salesperson Application";
         }
 
@@ -80,7 +76,6 @@ namespace Demo_TheTravelingSalesperson
             System.Environment.Exit(1);
         }
 
-
         /// <summary>
         /// display the welcome screen
         /// </summary>
@@ -90,8 +85,8 @@ namespace Demo_TheTravelingSalesperson
 
             ConsoleUtil.DisplayReset();
 
-            ConsoleUtil.DisplayMessage("Written by John Velis");
-            ConsoleUtil.DisplayMessage("Northwestern Michigan College");
+            ConsoleUtil.DisplayMessage("Created by Jason Luckhardt");
+            ConsoleUtil.DisplayMessage("NMC Homework Application");
             ConsoleUtil.DisplayMessage("");
 
             sb.Clear();
@@ -137,6 +132,56 @@ namespace Demo_TheTravelingSalesperson
             salesperson.AccountID = Console.ReadLine();
             ConsoleUtil.DisplayMessage("");
 
+            while (true) {
+                ConsoleUtil.DisplayMessage("Product Types:");
+                ConsoleUtil.DisplayMessage("");
+
+                //
+                // list all product types
+                //
+                for (int i = 1; i < Enum.GetNames(typeof(Product.ProductType)).Length; i++)
+                    Console.WriteLine("\t " + i + ". " + UnderscoreToSpace(Enum.GetName(typeof(Product.ProductType), i)));
+
+                //
+                // get product type, if invalid entry ask user to choose again.
+                //
+                ConsoleUtil.DisplayMessage("");
+                ConsoleUtil.DisplayPromptMessage("Select a product type. (1 - "+ Enum.GetNames(typeof(Product.ProductType)).Length + ") ");
+                ConsoleUtil.DisplayMessage("");
+                Product.ProductType productType;
+
+                ConsoleKeyInfo userResponse = Console.ReadKey(true);
+
+                if (Enum.TryParse<Product.ProductType>(userResponse.KeyChar.ToString(), out productType))
+                {
+                    salesperson.CurrentStock.Type = productType;
+                    ConsoleUtil.DisplayPromptMessage("You've selected "+UnderscoreToSpace(productType.ToString())+".");
+                    break;
+                }
+
+                ConsoleUtil.DisplayReset();
+
+                ConsoleUtil.DisplayMessage(
+                    "It appears you have selected an incorrect choice." + Environment.NewLine +
+                    "Press any key to continue or the ESC key to quit the application.");
+            }
+            ConsoleUtil.DisplayMessage("");
+
+            //
+            // get number of products in inventory
+            //
+            if (ConsoleValidator.TryGetIntegerFromUser(MINIMUM_BUYSELL_AMOUNT, MAXIMUM_BUYSELL_AMOUNT, MAXIMUM_ATTEMPTS, "products", out int numberOfUnits))
+            {
+                salesperson.CurrentStock.AddProducts(numberOfUnits);
+            }
+            else
+            {
+                ConsoleUtil.DisplayMessage("It appears you are having difficulty setting the number of products in your stock.");
+                ConsoleUtil.DisplayMessage("By default, the number of products in your inventory are now set to zero.");
+                salesperson.CurrentStock.AddProducts(0);
+                DisplayContinuePrompt();
+            }
+
             ConsoleUtil.DisplayMessage("");
 
             ConsoleUtil.DisplayReset();
@@ -166,6 +211,7 @@ namespace Demo_TheTravelingSalesperson
         public MenuOption DisplayGetUserMenuChoice()
         {
             MenuOption userMenuChoice = MenuOption.None;
+            int namesCount = Enum.GetNames(typeof(MenuOption)).Length;
             bool usingMenu = true;
 
             while (usingMenu)
@@ -181,48 +227,28 @@ namespace Demo_TheTravelingSalesperson
                 //
                 ConsoleUtil.DisplayMessage("Please type the number of your menu choice.");
                 ConsoleUtil.DisplayMessage("");
-                Console.Write(
-                    "\t" + "1. Travel" + Environment.NewLine +
-                    "\t" + "2. Display Cities" + Environment.NewLine +
-                    "\t" + "3. Display Account Info" + Environment.NewLine +
-                    "\t" + "E. Exit" + Environment.NewLine);
+
+                for (int i = 1; i < namesCount; i++)
+                    Console.Write("\t" + i + ". " + UnderscoreToSpace( Enum.GetName( typeof(MenuOption), i ) ) + Environment.NewLine);
 
                 //
                 // get and process the user's response
                 // note: ReadKey argument set to "true" disables the echoing of the key press
                 //
                 ConsoleKeyInfo userResponse = Console.ReadKey(true);
-                switch (userResponse.KeyChar)
-                {
-                    case '1':
-                        userMenuChoice = MenuOption.Travel;
-                        usingMenu = false;
-                        break;
-                    case '2':
-                        userMenuChoice = MenuOption.DisplayCities;
-                        usingMenu = false;
-                        break;
-                    case '3':
-                        userMenuChoice = MenuOption.DisplayAccountInfo;
-                        usingMenu = false;
-                        break;
-                    case 'E':
-                    case 'e':
-                        userMenuChoice = MenuOption.Exit;
-                        usingMenu = false;
-                        break;
-                    default:
-                        ConsoleUtil.DisplayMessage(
-                            "It appears you have selected an incorrect choice." + Environment.NewLine +
-                            "Press any key to continue or the ESC key to quit the application.");
 
-                        userResponse = Console.ReadKey(true);
-                        if (userResponse.Key == ConsoleKey.Escape)
-                        {
-                            usingMenu = false;
-                        }
-                        break;
+                if (!Enum.TryParse<MenuOption>(userResponse.KeyChar.ToString(), out userMenuChoice))
+                {
+                    ConsoleUtil.DisplayMessage(
+                        "It appears you have selected an incorrect choice." + Environment.NewLine +
+                        "Press any key to continue or the ESC key to quit the application.");
+
+                    userResponse = Console.ReadKey(true);
+                    if (userResponse.Key == ConsoleKey.Escape)
+                        usingMenu = false;
+                    break;
                 }
+                usingMenu = false;
             }
             Console.CursorVisible = true;
 
@@ -277,7 +303,7 @@ namespace Demo_TheTravelingSalesperson
             DisplayContinuePrompt();
         }
 
-        void DisplayBackorderNotification( Product product, int numberOfUnitsSold)
+        public void DisplayBackorderNotification( Product product, int numberOfUnitsSold)
         {
             ConsoleUtil.HeaderText = "Backordered Inventory!";
             ConsoleUtil.DisplayReset();
@@ -292,7 +318,7 @@ namespace Demo_TheTravelingSalesperson
             DisplayContinuePrompt();
         }
 
-        int DisplayGetNumberOfUnitsToBuy(Product product)
+        public int DisplayGetNumberOfUnitsToBuy(Product product)
         {
             ConsoleUtil.HeaderText = "Buy Inventory";
             ConsoleUtil.DisplayReset();
@@ -300,7 +326,7 @@ namespace Demo_TheTravelingSalesperson
             //
             // get number of products to buy
             //
-            ConsoleUtil.DisplayMessage("Buying " + product.Type.ToString() + " products.");
+            ConsoleUtil.DisplayMessage("Buying " + UnderscoreToSpace(product.Type.ToString()) + " products.");
             ConsoleUtil.DisplayMessage("");
 
             if (!ConsoleValidator.TryGetIntegerFromUser(MINIMUM_BUYSELL_AMOUNT, MAXIMUM_BUYSELL_AMOUNT, MAXIMUM_ATTEMPTS, "products", out int numberOfUnitsToBuy))
@@ -313,26 +339,67 @@ namespace Demo_TheTravelingSalesperson
 
             ConsoleUtil.DisplayReset();
 
-            ConsoleUtil.DisplayMessage(numberOfUnitsToBuy + " " + product.Type.ToString() + " products have been added to the inventory.");
+            ConsoleUtil.DisplayMessage(numberOfUnitsToBuy + " " + UnderscoreToSpace(product.Type.ToString()) + " products have been added to the inventory.");
 
             DisplayContinuePrompt();
 
             return numberOfUnitsToBuy;
         }
 
-        void DisplayGetNumberOfUnitsToSell( Product product)
+        public int DisplayGetNumberOfUnitsToSell( Product product)
         {
+            ConsoleUtil.HeaderText = "Sell Inventory";
+            ConsoleUtil.DisplayReset();
+
+            //
+            // Get number of products to sell.
+            //
+            ConsoleUtil.DisplayMessage("Selling " + UnderscoreToSpace(product.Type.ToString()) + " products.");
+            ConsoleUtil.DisplayMessage("");
+
+            if(!ConsoleValidator.TryGetIntegerFromUser(MINIMUM_BUYSELL_AMOUNT, MAXIMUM_BUYSELL_AMOUNT, MAXIMUM_ATTEMPTS, "products", out int numberOfUnitsToSell))
+            {
+                ConsoleUtil.DisplayMessage("It appears you are having difficulty setting the number of products to sell.");
+                ConsoleUtil.DisplayMessage("By default, the number of pruducts to sell will be set to zero.");
+                numberOfUnitsToSell = 0;
+                DisplayContinuePrompt();
+            }
+
+            ConsoleUtil.DisplayReset();
+
+            ConsoleUtil.DisplayMessage(numberOfUnitsToSell + " " + UnderscoreToSpace(product.Type.ToString()) + (numberOfUnitsToSell > 1 && product.Type.ToString().Last() != 's' ? "s" : "") + " have been subtracted from the inventory.");
+
+            DisplayContinuePrompt();
+
+            return numberOfUnitsToSell;
 
         }
 
-        void DisplayInventory(Product product)
+        public void DisplayInventory(Product product)
         {
+            ConsoleUtil.HeaderText = "Current Inventory";
+            ConsoleUtil.DisplayReset();
 
+            ConsoleUtil.DisplayMessage("Product type: " + UnderscoreToSpace(product.Type.ToString()));
+            ConsoleUtil.DisplayMessage("Number of units: " + product.NumberOfUnits.ToString());
+            ConsoleUtil.DisplayMessage("");
+
+            DisplayContinuePrompt();
         }
 
-        string UppercaseFirst(string s)
+        /// <summary>
+        /// Changes string to lowercase with first letter uppercase.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        string UppercaseFirst(string s = " ")
         {
-            return "";
+            return s.First().ToString().ToUpper() + s.Substring(1);
+        }
+
+        string UnderscoreToSpace(string s = " ")
+        {
+            return s.Replace('_', ' ');
         }
         #endregion
     }

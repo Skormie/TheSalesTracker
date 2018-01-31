@@ -7,8 +7,11 @@
     {
         None,
         Travel,
-        DisplayCities,
-        DisplayAccountInfo,
+        Buy,
+        Sell,
+        Display_Inventory,
+        Display_Cities,
+        Display_Account_Info,
         Exit
     }
 }

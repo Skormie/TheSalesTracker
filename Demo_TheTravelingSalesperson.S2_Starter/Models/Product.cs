@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace Demo_TheTravelingSalesperson
 {
-    class Product
+    public class Product
     {
         public enum ProductType
         {
             None,
-            Furry,
-            Spotted,
-            Dancing
+            PVP_Helm,
+            God_wings,
+            Ahura,
+            Angra
         }
 
         private int _numberOfUnits;
@@ -39,12 +40,12 @@ namespace Demo_TheTravelingSalesperson
             set { _type = value; }
         }
 
-        void AddProducts(int unitsToAdd)
+        public void AddProducts(int unitsToAdd)
         {
             _numberOfUnits += unitsToAdd;
         }
 
-        void SubtractProducts(int unitsToSubtract)
+        public void SubtractProducts(int unitsToSubtract)
         {
             if (_numberOfUnits < unitsToSubtract)
             {
@@ -53,12 +54,12 @@ namespace Demo_TheTravelingSalesperson
             _numberOfUnits -= unitsToSubtract;
         }
 
-        Product()
+        public Product()
         {
 
         }
 
-        Product(ProductType type, int numberOfUnits)
+        public Product(ProductType type, int numberOfUnits)
         {
 
         }
