@@ -208,10 +208,11 @@ namespace Demo_TheTravelingSalesperson
         /// <summary>
         /// get the menu choice from the user
         /// </summary>
-        public MenuOption DisplayGetUserMenuChoice()
+        public string DisplayGetUserMenuChoice()
         {
-            MenuOption userMenuChoice = MenuOption.None;
-            int namesCount = Enum.GetNames(typeof(MenuOption)).Length;
+            string userMenuChoice = "0";
+            //int namesCount = Enum.GetNames(typeof(MenuOption)).Length;
+            int namesCount = MenuOption.MainOption.Count();
             bool usingMenu = true;
 
             while (usingMenu)
@@ -228,8 +229,14 @@ namespace Demo_TheTravelingSalesperson
                 ConsoleUtil.DisplayMessage("Please type the number of your menu choice.");
                 ConsoleUtil.DisplayMessage("");
 
+                //for (int i = 1; i < namesCount; i++)
+                //    Console.Write("\t" + i + ". " + UnderscoreToSpace( Enum.GetName( typeof(MenuOption), i ) ) + Environment.NewLine);
+
+                List<string> keyList = new List<string>(MenuOption.MainOption.Keys);
                 for (int i = 1; i < namesCount; i++)
-                    Console.Write("\t" + i + ". " + UnderscoreToSpace( Enum.GetName( typeof(MenuOption), i ) ) + Environment.NewLine);
+                {
+                    Console.Write("\t" + keyList[i].ToUpper() + ". " + MenuOption.MainOption[keyList[i]] + Environment.NewLine);
+                }
 
                 //
                 // get and process the user's response
@@ -237,7 +244,19 @@ namespace Demo_TheTravelingSalesperson
                 //
                 ConsoleKeyInfo userResponse = Console.ReadKey(true);
 
-                if (!Enum.TryParse<MenuOption>(userResponse.KeyChar.ToString(), out userMenuChoice))
+                //if (!Enum.TryParse<MenuOption>(userResponse.KeyChar.ToString(), out userMenuChoice))
+                //{
+                //    ConsoleUtil.DisplayMessage(
+                //        "It appears you have selected an incorrect choice." + Environment.NewLine +
+                //        "Press any key to continue or the ESC key to quit the application.");
+
+                //    userResponse = Console.ReadKey(true);
+                //    if (userResponse.Key == ConsoleKey.Escape)
+                //        usingMenu = false;
+                //    break;
+                //}
+
+                if (!MenuOption.MainOption.ContainsKey(userResponse.KeyChar.ToString()))
                 {
                     ConsoleUtil.DisplayMessage(
                         "It appears you have selected an incorrect choice." + Environment.NewLine +
@@ -248,6 +267,9 @@ namespace Demo_TheTravelingSalesperson
                         usingMenu = false;
                     break;
                 }
+
+                userMenuChoice = userResponse.KeyChar.ToString();
+
                 usingMenu = false;
             }
             Console.CursorVisible = true;

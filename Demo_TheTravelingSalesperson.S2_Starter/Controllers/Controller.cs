@@ -69,14 +69,11 @@ namespace Demo_TheTravelingSalesperson
         /// </summary>
         private void ManageApplicationLoop()
         {
-            MenuOption userMenuChoice;
+            //MenuOption userMenuChoice;
+
+            string userMenuChoice;
 
             _consoleView.DisplayWelcomeScreen();
-
-            //
-            // setup initial salesperson account
-            //
-            _salesperson = _consoleView.DisplaySetupAccount();
 
             //
             // application loop
@@ -92,7 +89,44 @@ namespace Demo_TheTravelingSalesperson
                 //
                 // choose an action based on the user's menu choice
                 //
-                switch (userMenuChoice)
+
+                switch (MenuOption.MainOption[userMenuChoice])
+                {
+                    case "Setup Account":
+                        DisplaySetupAccount();
+                        break;
+                    case "Travel":
+                        Travel();
+                        break;
+                    case "Buy":
+                        Buy();
+                        break;
+                    case "Sell":
+                        Sell();
+                        break;
+                    case "Display Inventory":
+                        DisplayInventory();
+                        break;
+                    case "Display Cities":
+                        DisplayCities();
+                        break;
+                    case "Display Account Info":
+                        DisplayAccountInfo();
+                        break;
+                    case "Save Account Info":
+                        SaveAccountInfo();
+                        break;
+                    case "Load Account Info":
+                        ReadAccountInfo();
+                        break;
+                    case "Exit":
+                        _usingApplication = false;
+                        break;
+                    default:
+                        break;
+                }
+
+                /*switch (userMenuChoice)
                 {
                     case MenuOption.None:
                         break;
@@ -114,12 +148,18 @@ namespace Demo_TheTravelingSalesperson
                     case MenuOption.Display_Account_Info:
                         DisplayAccountInfo();
                         break;
+                    case MenuOption.Save_Account_Info:
+                        SaveAccountInfo();
+                        break;
+                    case MenuOption.Load_Account_Info:
+                        ReadAccountInfo();
+                        break;
                     case MenuOption.Exit:
                         _usingApplication = false;
                         break;
                     default:
                         break;
-                }
+                }*/
             }
 
             _consoleView.DisplayClosingScreen();
@@ -128,6 +168,14 @@ namespace Demo_TheTravelingSalesperson
             // close the application
             //
             Environment.Exit(1);
+        }
+
+        private void DisplaySetupAccount()
+        {
+            //
+            // setup initial salesperson account
+            //
+            _salesperson = _consoleView.DisplaySetupAccount();
         }
 
         /// <summary>
@@ -180,6 +228,16 @@ namespace Demo_TheTravelingSalesperson
         private void DisplayAccountInfo()
         {
             _consoleView.DisplayAccountInfo(_salesperson);
+        }
+
+        private void SaveAccountInfo()
+        {
+            InitializeDataFileJson.WriteJsonFile(_salesperson);
+        }
+
+        private void ReadAccountInfo()
+        {
+            _salesperson = InitializeDataFileJson.ReadJsonFile();
         }
 
         #endregion
