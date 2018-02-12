@@ -23,13 +23,15 @@ namespace Demo_TheTravelingSalesperson
         private ConsoleView _consoleView;
         private Salesperson _salesperson;
 
+        private JsonServices _jsonService = new JsonServices(DataSettings.dataFilePathJson);
+
         #endregion
 
         #region PROPERTIES
 
 
         #endregion
-        
+
         #region CONSTRUCTORS
 
         public Controller()
@@ -75,6 +77,8 @@ namespace Demo_TheTravelingSalesperson
 
             _consoleView.DisplayWelcomeScreen();
 
+            InitializeDataFileJson.SeedDataFile();
+
             //
             // application loop
             //
@@ -119,47 +123,21 @@ namespace Demo_TheTravelingSalesperson
                     case "Load Account Info":
                         ReadAccountInfo();
                         break;
+                    case "Add Inventory":
+                        DisplayAddInventory();
+                        break;
+                    case "Update Account":
+                        DisplayUpdateAccount();
+                        break;
+                    case "Display Logs":
+                        DisplayLogs();
+                        break;
                     case "Exit":
                         _usingApplication = false;
                         break;
                     default:
                         break;
                 }
-
-                /*switch (userMenuChoice)
-                {
-                    case MenuOption.None:
-                        break;
-                    case MenuOption.Travel:
-                        Travel();
-                        break;
-                    case MenuOption.Buy:
-                        Buy();
-                        break;
-                    case MenuOption.Sell:
-                        Sell();
-                        break;
-                    case MenuOption.Display_Inventory:
-                        DisplayInventory();
-                        break;
-                    case MenuOption.Display_Cities:
-                        DisplayCities();
-                        break;
-                    case MenuOption.Display_Account_Info:
-                        DisplayAccountInfo();
-                        break;
-                    case MenuOption.Save_Account_Info:
-                        SaveAccountInfo();
-                        break;
-                    case MenuOption.Load_Account_Info:
-                        ReadAccountInfo();
-                        break;
-                    case MenuOption.Exit:
-                        _usingApplication = false;
-                        break;
-                    default:
-                        break;
-                }*/
             }
 
             _consoleView.DisplayClosingScreen();
@@ -176,6 +154,23 @@ namespace Demo_TheTravelingSalesperson
             // setup initial salesperson account
             //
             _salesperson = _consoleView.DisplaySetupAccount();
+            _salesperson.Logs.Push(DateTime.Now + " ... Account Created!");
+        }
+
+        private void DisplayLogs()
+        {
+            _consoleView.DisplayLogs(_salesperson);
+        }
+
+        private void DisplayAddInventory()
+        {
+            _consoleView.DisplayAddInventory(_salesperson);
+        }
+
+        private void DisplayUpdateAccount()
+        {
+            _consoleView.DisplayUpdateAccount(_salesperson);
+            _salesperson.Logs.Push(DateTime.Now + " ... Account Information Updated!");
         }
 
         /// <summary>
@@ -196,17 +191,35 @@ namespace Demo_TheTravelingSalesperson
 
         private void Buy()
         {
-            int numberOfUnits = _consoleView.DisplayGetNumberOfUnitsToBuy( _salesperson.CurrentStock );
-            _salesperson.CurrentStock.AddProducts(numberOfUnits);
+            if (_salesperson.CurrentStock.Count() <= 0)
+            {
+                _consoleView.DisplayInventoryError();
+                return;
+            }
+            Product selectedProduct = _consoleView.DisplayGetNumberOfUnitsToBuy( _salesperson.CurrentStock );
+            _salesperson.CurrentStock.Find(x => x.Type == selectedProduct.Type).AddProducts(selectedProduct.NumberOfUnits);
+            _salesperson.Logs.Push(DateTime.Now + " ... Purchased "+ selectedProduct.NumberOfUnits+" "+ selectedProduct.Type + "!");
         }
 
         private void Sell()
         {
-            int numberOfUnits = _consoleView.DisplayGetNumberOfUnitsToSell(_salesperson.CurrentStock);
-            _salesperson.CurrentStock.SubtractProducts(numberOfUnits);
+            if (_salesperson.CurrentStock.Count() <= 0)
+            {
+                _consoleView.DisplayInventoryError();
+                return;
+            }
+            Product selectedProduct = _consoleView.DisplayGetNumberOfUnitsToSell(_salesperson.CurrentStock);
+            Product targetProduct = _salesperson.CurrentStock.Find(x => x.Type == selectedProduct.Type);
+            targetProduct.SubtractProducts(selectedProduct.NumberOfUnits);
 
-            if (_salesperson.CurrentStock.OnBackorder)
-                _consoleView.DisplayBackorderNotification(_salesperson.CurrentStock, numberOfUnits);
+            if (targetProduct.OnBackorder)
+            {
+                _consoleView.DisplayBackorderNotification(targetProduct, selectedProduct.NumberOfUnits);
+                _salesperson.Logs.Push(DateTime.Now + " ... Backordered " + selectedProduct.NumberOfUnits + " " + selectedProduct.Type + "!");
+            } else
+            {
+                _salesperson.Logs.Push(DateTime.Now + " ... Sold " + selectedProduct.NumberOfUnits + " " + selectedProduct.Type + "!");
+            }
         }
 
         private void DisplayInventory()
@@ -232,12 +245,26 @@ namespace Demo_TheTravelingSalesperson
 
         private void SaveAccountInfo()
         {
-            InitializeDataFileJson.WriteJsonFile(_salesperson);
+            bool active;
+            active = _consoleView.DisplaySaveAccountInfo(_salesperson, out bool attempted);
+            if (active)
+            {
+                _consoleView.DisplayConfirmSaveAccountInfo();
+                _jsonService.WriteJsonFile(_salesperson);
+                _salesperson.Logs.Push(DateTime.Now + " ... Account Information Saved!");
+            }
         }
 
         private void ReadAccountInfo()
         {
-            _salesperson = InitializeDataFileJson.ReadJsonFile();
+            bool active;
+            active = _consoleView.DisplayLoadAccountInfo(out bool attempted, _jsonService.ReadJsonFile());
+            if (active)
+            {
+                _salesperson = _jsonService.ReadJsonFile();
+                _consoleView.DisplayConfirmLoadAccountInfo(_salesperson);
+                _salesperson.Logs.Push(DateTime.Now + " ... Account Information Loaded!");
+            }
         }
 
         #endregion

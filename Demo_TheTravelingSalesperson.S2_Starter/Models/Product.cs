@@ -18,21 +18,20 @@ namespace Demo_TheTravelingSalesperson
         }
 
         private int _numberOfUnits;
+        private ProductType _type;
+        private bool _onBackorder;
 
         public int NumberOfUnits
         {
             get { return _numberOfUnits; }
+            set { _numberOfUnits = value; }
         }
-
-        private bool _onBackorder;
 
         public bool OnBackorder
         {
             get { return _onBackorder; }
             set { _onBackorder = value; }
         }
-
-        private ProductType _type;
 
         public ProductType Type
         {
@@ -59,9 +58,11 @@ namespace Demo_TheTravelingSalesperson
 
         }
 
-        public Product(ProductType type, int numberOfUnits)
+        public Product(ProductType type, int numberOfUnits, bool onBackorder)
         {
-
+            Type = type;
+            NumberOfUnits = numberOfUnits;
+            OnBackorder = onBackorder;
         }
 
     }

@@ -10,30 +10,31 @@ namespace Demo_TheTravelingSalesperson
 {
     public class InitializeDataFileJson
     {
-
-        public static void WriteJsonFile( Salesperson salesperson )
+        private static Salesperson InitializeSalesperson()
         {
-            StreamWriter sWriter = new StreamWriter(DataSettings.dataFilePathJson);
-
-            using (sWriter)
+            Salesperson salesperson = new Salesperson()
             {
-                sWriter.Write(JsonConvert.SerializeObject(salesperson));
-            }
+                FirstName = "Bonzo",
+                LastName = "Regan",
+                AccountID = "banana103",
+                CitiesVisited = new List<string>()
+                {
+                    "Detroit",
+                    "Grand Rapids",
+                    "Ann Arbor"
+                }
+            };
 
+            salesperson.CurrentStock.Add(new Product(Product.ProductType.PVP_Helm, 20, false));
+
+            return salesperson;
         }
 
-        public static Salesperson ReadJsonFile()
+        public static void SeedDataFile()
         {
-            Salesperson salesPerson = new Salesperson();
-            StreamReader sReader = new StreamReader(DataSettings.dataFilePathJson);
+            JsonServices jsonService = new JsonServices(DataSettings.dataFilePathJson);
 
-            using (sReader)
-            {
-                salesPerson = JsonConvert.DeserializeObject<Salesperson>(sReader.ReadToEnd());
-            }
-
-            return salesPerson;
+            jsonService.WriteJsonFile(InitializeSalesperson());
         }
-
     }
 }

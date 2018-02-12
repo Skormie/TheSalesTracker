@@ -13,8 +13,10 @@ namespace Demo_TheTravelingSalesperson
         private string _lastName;
         private string _accountID;
         private List<string> _citiesVisited;
-        private Product _currentStock;
-
+        private List<Product> _currentStock;
+        private bool _active;
+        private int _age;
+        private Stack<string> _logs;
 
         #endregion
 
@@ -43,11 +45,28 @@ namespace Demo_TheTravelingSalesperson
             get { return _citiesVisited; }
             set { _citiesVisited = value; }
         }
+        public Stack<string> Logs
+        {
+            get { return _logs; }
+            set { _logs = value; }
+        }
 
-        public Product CurrentStock
+        public List<Product> CurrentStock
         {
             get { return _currentStock; }
             set { _currentStock = value; }
+        }
+
+        public int Age
+        {
+            get { return _age; }
+            set { _age = value; }
+        }
+
+        public bool Active
+        {
+            get { return _active; }
+            set { _active = value; }
         }
 
         #endregion
@@ -57,17 +76,21 @@ namespace Demo_TheTravelingSalesperson
         public Salesperson()
         {
             _citiesVisited = new List<string>();
-            _currentStock = new Product();
+            _currentStock = new List<Product>();
+            _logs = new Stack<string>();
         }
 
-        public Salesperson(string firstName, string lastName, string acountID)
+        public Salesperson(string firstName, string lastName, string acountID, int age = 0, bool active = true)
         {
             _firstName = firstName;
             _lastName = lastName;
             _accountID = acountID;
+            _active = active;
+            _age = age;
 
+            _logs = new Stack<string>();
             _citiesVisited = new List<string>();
-            _currentStock = new Product();
+            _currentStock = new List<Product>();
         }
 
         #endregion
