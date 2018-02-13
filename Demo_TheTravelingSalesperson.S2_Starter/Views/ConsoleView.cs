@@ -260,6 +260,7 @@ namespace Demo_TheTravelingSalesperson
 
             ConsoleUtil.DisplayMessage("First Name: " + salesperson.FirstName);
             ConsoleUtil.DisplayMessage("Last Name: " + salesperson.LastName);
+            ConsoleUtil.DisplayMessage("Age: " + salesperson.Age);
             ConsoleUtil.DisplayMessage("Account ID: " + salesperson.AccountID);
 
             DisplayContinuePrompt();
@@ -650,6 +651,7 @@ namespace Demo_TheTravelingSalesperson
                     ConsoleUtil.DisplayMessage("It appears you've entered an incorrect value. You have " + (maxAttempts - attempts) + " attempts(s) left.");
                     continue;
                 }
+                output = userInput;
                 break;
             }
             while (!loop || attempts <= maxAttempts);
