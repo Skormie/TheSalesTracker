@@ -11,9 +11,9 @@ namespace Demo_TheTravelingSalesperson
     /// </summary>
     public class ConsoleView
     {
-        int MAXIMUM_ATTEMPTS = 10;
-        int MINIMUM_BUYSELL_AMOUNT = 1;
-        int MAXIMUM_BUYSELL_AMOUNT = 100;
+        const int MAXIMUM_ATTEMPTS = 10;
+        const int MINIMUM_BUYSELL_AMOUNT = 0;
+        const int MAXIMUM_BUYSELL_AMOUNT = 100;
 
         #region PROPERTIES
 
@@ -120,16 +120,16 @@ namespace Demo_TheTravelingSalesperson
             ConsoleUtil.DisplayMessage("Setup your account now.");
             ConsoleUtil.DisplayMessage("");
 
-            ConsoleUtil.DisplayPromptMessage("Enter your first name: ");
-            salesperson.FirstName = Console.ReadLine();
+            salesperson.FirstName = ValidateString("Enter your First Name: ", "Unknown", out bool attemptsExceeded, 3);
             ConsoleUtil.DisplayMessage("");
 
-            ConsoleUtil.DisplayPromptMessage("Enter your last name: ");
-            salesperson.LastName = Console.ReadLine();
+            salesperson.LastName = ValidateString("Enter your Last Name: ", "Unknown", out attemptsExceeded, 3);
             ConsoleUtil.DisplayMessage("");
 
-            ConsoleUtil.DisplayPromptMessage("Enter your account ID: ");
-            salesperson.AccountID = Console.ReadLine();
+            salesperson.Age = ValidateInt("Enter your age: ", out attemptsExceeded, 3);
+            ConsoleUtil.DisplayMessage("");
+
+            salesperson.AccountID = ValidateString("Enter your Account ID: ", "Unknown", out attemptsExceeded, 3);
             ConsoleUtil.DisplayMessage("");
 
             DisplayAddInventory(salesperson);
@@ -513,10 +513,10 @@ namespace Demo_TheTravelingSalesperson
                 // get product type, if invalid entry ask user to choose again.
                 //
                 ConsoleUtil.DisplayMessage("");
-                ConsoleUtil.DisplayPromptMessage("Select a product type. (1 - " + (Enum.GetNames(typeof(Product.ProductType)).Length - 1) + ") ");
-                ConsoleUtil.DisplayMessage("");
+                ConsoleUtil.DisplayPromptMessage("Select a product type. (1 - " + (Enum.GetNames(typeof(Product.ProductType)).Length - 1) + "): ");
 
                 ConsoleKeyInfo userResponse = Console.ReadKey(true);
+                ConsoleUtil.DisplayMessage("");
 
                 if (Enum.TryParse<Product.ProductType>(userResponse.KeyChar.ToString(), out productType))
                 {
@@ -526,7 +526,7 @@ namespace Demo_TheTravelingSalesperson
                     }
                     else
                     {
-                        ConsoleUtil.DisplayPromptMessage("You've selected " + UnderscoreToSpace(productType.ToString()) + ".");
+                        ConsoleUtil.DisplayMessage("You've selected " + UnderscoreToSpace(productType.ToString()) + ".");
                         break;
                     }
                 }
@@ -590,6 +590,70 @@ namespace Demo_TheTravelingSalesperson
                     "Press any key to continue or the ESC key to quit the application.");
             }
             return products[selection - 1].Type;
+        }
+
+        int ValidateInt( string prompt, out bool attemptsExceeded, int maxAttempts = MAXIMUM_ATTEMPTS )
+        {
+            bool loop;
+            int output, attempts = 0;
+            string userInput;
+            attemptsExceeded = false;
+            do
+            {
+                ConsoleUtil.DisplayPromptMessage(prompt);
+                userInput = Console.ReadLine();
+                loop = int.TryParse(userInput, out output);
+
+                if (!loop)
+                {
+                    ConsoleUtil.DisplayReset();
+                    attempts++;
+                    if(attempts == maxAttempts)
+                    {
+                        ConsoleUtil.DisplayMessage("Max attempts exceeded! Value set to zero.");
+                        output = 0;
+                        attemptsExceeded = true;
+                        break;
+                    }
+                    ConsoleUtil.DisplayMessage("It appears you've entered an incorrect value. You have "+(maxAttempts-attempts)+" attempts(s) left.");
+                    continue;
+                }
+                break;
+            }
+            while (!loop || attempts <= maxAttempts);
+            return output;
+        }
+
+        string ValidateString(string prompt, string defaultValue, out bool attemptsExceeded, int maxAttempts = MAXIMUM_ATTEMPTS)
+        {
+            bool loop;
+            int attempts = 0;
+            string output = defaultValue;
+            string userInput;
+            attemptsExceeded = false;
+            do
+            {
+                ConsoleUtil.DisplayPromptMessage(prompt);
+                userInput = Console.ReadLine();
+                loop = userInput == "" ? false : true;
+
+                if (!loop)
+                {
+                    ConsoleUtil.DisplayReset();
+                    attempts++;
+                    if (attempts == maxAttempts)
+                    {
+                        ConsoleUtil.DisplayMessage("Max attempts exceeded! Value set to "+defaultValue+".");
+                        attemptsExceeded = true;
+                        break;
+                    }
+                    ConsoleUtil.DisplayMessage("It appears you've entered an incorrect value. You have " + (maxAttempts - attempts) + " attempts(s) left.");
+                    continue;
+                }
+                break;
+            }
+            while (!loop || attempts <= maxAttempts);
+            return output;
         }
 
         /// <summary>
